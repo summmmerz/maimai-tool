@@ -48,7 +48,7 @@ def main():
             votes[s['version']][d['basic_info'].get('from', '?')] += 1
 
     songs, mismatch, nodf, diff_hist = [], 0, 0, collections.Counter()
-    vname_df = vname_fb = 0
+    vname_df = vname_fb = dropped = 0
     for s in lx:
         sid = int(s['id'])
         blk = {k: v for k, v in s['difficulties'].items() if isinstance(v, list)}
@@ -66,7 +66,7 @@ def main():
         else:
             vname_df += 1
         charts = []
-        for typ in ('standard', 'dx', 'utage'):
+        for typ in ('standard', 'dx'):        # 宴会场不收录：抽歌器与推分都用不上
             cs = blk.get(typ, [])
             if not cs:
                 continue
@@ -91,6 +91,9 @@ def main():
                     'notes': notes,
                     'is_new': bool((srcs[typ] or {}).get('basic_info', {}).get('is_new')),
                 })
+        if not charts:
+            dropped += 1                      # 只剩宴谱的曲目，整首丢掉
+            continue
         for c in charts:
             diff_hist[c['name']] += 1
         songs.append({
@@ -124,7 +127,7 @@ def main():
     with open(OUT, 'w', encoding='utf-8') as f:
         json.dump(payload, f, ensure_ascii=False, separators=(',', ':'))
     print('songs=%d charts=%d  size=%.0fKB' % (len(songs), sum(len(s['charts']) for s in songs), os.path.getsize(OUT) / 1024))
-    print('无对应水鱼条目=%d  物量对不齐(已放弃)=%d' % (nodf, mismatch))
+    print('无对应水鱼条目=%d  物量对不齐(已放弃)=%d  丢弃的纯宴谱曲目=%d' % (nodf, mismatch, dropped))
     print('难度分布:', dict(diff_hist))
     print('版本名: 水鱼直接给出=%d  回退到推导映射=%d' % (vname_df, vname_fb))
     print('物量缺失谱面=%d / %d' % (sum(1 for s in songs for c in s['charts'] if c['notes'] is None),

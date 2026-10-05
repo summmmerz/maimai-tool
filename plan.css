@@ -1,6 +1,7 @@
 /* 推分规划器专用样式（基础样式复用 style.css） */
 :root{--cut2:13px}
 .phero{display:flex;align-items:flex-end;gap:28px;flex-wrap:wrap;padding:26px 30px 14px;max-width:1500px;margin:0 auto}
+.phero .actbtn{margin-top:12px}
 .phero h1{margin:8px 0 0;font:700 70px/1 var(--disp);letter-spacing:.01em;color:#fff}
 .phero h1 .unit{font-size:26px;color:var(--hi);margin-left:8px;vertical-align:super}
 .kpis{display:flex;gap:12px;flex-wrap:wrap;flex:1;justify-content:flex-end}

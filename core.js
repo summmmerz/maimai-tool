@@ -132,6 +132,7 @@
   function versionsOf(entries) {
     var map = {};
     entries.forEach(function (e) {
+      if (e.utage) return;          // 宴会场不是稼动版本，不进版本筛选（数据里也已被剔除）
       if (!map[e.ver] || e.vcode < map[e.ver]) map[e.ver] = e.vcode;
     });
     return Object.keys(map).sort(function (a, b) { return map[a] - map[b]; });
