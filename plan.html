@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>推分规划器 · MAIMAI DX</title>
+<meta name="theme-color" content="#07080b" />
+<link rel="manifest" href="manifest.json" />
+<link rel="icon" href="icons/icon-192.png" />
+<link rel="apple-touch-icon" href="icons/icon-192.png" />
+<link rel="stylesheet" href="style.css" />
+<link rel="stylesheet" href="plan.css" />
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+<div class="scan" aria-hidden="true"></div>
+
+<header class="phero">
+  <div>
+    <p class="kicker">MAIMAI DX · RATING PLANNER</p>
+    <h1><span id="rating">--</span><span class="unit">R</span></h1>
+    <p class="src"><b id="who">读取中…</b> <span id="modeTag" class="pill"></span> <span id="when"></span></p>
+  </div>
+  <div class="kpis" id="kpis"></div>
+</header>
+
+<main class="pmain">
+  <section class="pbox">
+    <h2><em>00</em> 取成绩</h2>
+    <p class="hint">手机上没 bat 可点，直接在这里拉：填<b>水鱼查分器的用户名</b>，点「拉取 B50」。
+      水鱼接口开放跨域（实测 <code>OPTIONS 200</code> + <code>Access-Control-Allow-Headers: content-type</code>），
+      所以不需要任何密钥、不需要后端。拉到的成绩存在这台设备的浏览器里，下次打开还在。</p>
+    <div class="fetchrow">
+      <input id="uname" type="text" placeholder="水鱼用户名" autocomplete="username" />
+      <button class="mini big" id="fetchBtn">拉取 B50</button>
+      <button class="mini big" id="clearLocal">清除本机成绩</button>
+    </div>
+    <p class="hint" id="fetchMsg"></p>
+    <p class="hint">想看<b>完整成绩</b>（多一张「新血」表）：去水鱼官网登录 →「编辑个人资料」生成
+      <b>Import-Token</b>，粘到下面。令牌只会发给水鱼接口并存在你自己的浏览器里，本页没有任何第三方脚本，
+      随时可以在官网重置。不填也能用，就只是只有 B50。</p>
+    <div class="fetchrow">
+      <input id="itoken" type="password" placeholder="Import-Token（可选，换完整成绩）" autocomplete="off" />
+      <button class="mini big" id="fetchFull">拉取完整成绩</button>
+      <label class="chk"><input type="checkbox" id="remember" /> 记住这台设备</label>
+    </div>
+  </section>
+
+  <section class="pbox">
+    <h2><em>01</em> 距下一千</h2>
+    <div class="bar"><i id="bar" style="width:0"></i></div>
+    <div class="bar-txt"><span id="barNow">--</span><span id="barNext">--</span></div>
+    <p class="hint" id="milestone">--</p>
+  </section>
+
+  <section class="pbox">
+    <h2><em>02</em> 临门一脚 · 把已有成绩再抬一档
+      <span class="spacer2"></span>
+      <button class="mini on" id="sortGap">按临门一脚</button>
+      <button class="mini" id="sortGain">按加分最多</button>
+      <label class="chk"><input type="checkbox" id="onlyGain" checked /> 只看进分的</label>
+    </h2>
+    <p class="hint">只推荐<strong>实际够得着</strong>的档位：97% / 98% / 99% / 99.5% / 100% / 100.5%。
+      （水鱼系数表里的 98.9999 / 99.9999 / 100.4999 是 0.0001% 宽的边界占位行，打不到，
+      而且系数被紧跟的整点档位严格压制，所以不作目标。）
+      默认按 <strong>离下一档最近</strong> 排序——越靠上越是真的「临门一脚」；
+      「总分增益」是重算 Top35 / Top15 竞争后的真实变化，增益 0 = 这张现在不进分。</p>
+    <div class="tablewrap"><table id="tNow"></table></div>
+  </section>
+
+  <section class="pbox">
+    <h2><em>03</em> 新血 · 还没打过的潜力谱</h2>
+    <p class="hint" id="newHint">--</p>
+    <div class="tablewrap"><table id="tNew"></table></div>
+  </section>
+</main>
+
+<footer>评分口径 = 旧曲 Top35 + 新曲 Top15（与官方一致）· 数据来自水鱼查分器 · <a href="index.html">← 回到抽歌器</a></footer>
+<script src="core.js"></script>
+<script src="plan.js"></script>
+<script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}</script>
+</body>
+</html>

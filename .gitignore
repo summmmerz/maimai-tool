@@ -1,0 +1,6 @@
+# 本机配置：含你的水鱼用户名 / Import-Token，别提交
+config.json
+# 你的真实成绩，不要公开
+data/records.json
+# 曲库原始响应缓存（1.7MB，可重新抓）
+data/raw_*.json
