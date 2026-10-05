@@ -53,7 +53,7 @@
   }
 
   function renderExisting(rows) {
-    var head = '<tr><th>曲目</th><th>定数</th><th>现在</th><th>还差</th><th>目标档位</th><th>单曲 ra</th><th>总分增益</th><th>抬升后总评</th></tr>';
+    var head = '<thead><tr><th>曲目</th><th>定数</th><th>现在</th><th>还差</th><th>目标档位</th><th>单曲 ra</th><th>总分增益</th><th>抬升后总评</th></tr></thead>';
     var list = (rows || []).slice();
     if (S.onlyGain) list = list.filter(function (r) { return r.gain > 0; });
     if (S.sort === 'gain') {
@@ -63,14 +63,14 @@
     }
     if (!list.length) {
       $('tNow').innerHTML = head + '<tr><td colspan="8" class="empty2">' +
-        (rows && rows.length ? '没有「能进分」的可抬升谱面，取消勾选「只看进分的」可以看全部。'
-                             : '没有可抬升的谱面（已全部顶到 100.5%）。') + '</td></tr>';
+        (rows && rows.length ? '没有能进分的谱面 · 去掉「只看进分」看全部'
+                              : '已全部顶到 100.5%') + '</td></tr>';
       return;
     }
     $('tNow').innerHTML = head + list.slice(0, 30).map(function (r) {
       var c = r.c;
       var tgt = (r.need % 1 === 0 ? r.need.toFixed(0) : r.need.toFixed(1)) + '%';
-      var col = DC[DIFF_BY_INDEX[c.level_index]] || '#ff2d6f';
+      var col = DC[DIFF_BY_INDEX[c.level_index]] || '#ff4fa3';
       return '<tr style="--c:' + col + '">' +
         '<td data-label="曲目"><span class="t">' + esc(c.title) + '</span><span class="sub">' +
         esc(c.level_label || c.type) + '</span></td>' +
@@ -117,22 +117,21 @@
   }
 
   function renderNew(rows) {
-    var head = '<tr><th>曲目</th><th>难度</th><th>定数</th><th>打满(100.5%)ra</th><th>满分时的总分增益</th></tr>';
+    var head = '<thead><tr><th>曲目</th><th>难度</th><th>定数</th><th>打满(100.5%)ra</th><th>满分时的总分增益</th></tr></thead>';
     if (rows === null) {
-      $('newHint').innerHTML = '当前是 <b>B50 模式</b>，只能看到你最好的一批成绩，无法判断「哪些没打过」。' +
-        '想要这张表：去水鱼官网个人资料页生成 <b>Import-Token</b>，填进 <code>config.json</code> 后重跑 fetch-records.bat。';
+      $('newHint').innerHTML = '<b>B50 模式</b> · 判断不了没打过的谱';
       $('tNew').innerHTML = head + '<tr><td colspan="5" class="empty2">B50 模式下不可用。</td></tr>';
       return;
     }
-    $('newHint').innerHTML = '只列出「打满 100.5% 时单曲 ra ≥ 当前 B50 门槛（' + S.cutoff +
-      '）」的谱面，共 ' + rows.length + ' 张。增益已按 Top35/Top15 竞争重算——打满也挤不进去的就是 0。';
+    $('newHint').innerHTML = '打满 100.5% 可进分 · 门槛 ra ' + S.cutoff +
+      ' · <b>' + rows.length + '</b> 张';
     if (!rows.length) {
       $('tNew').innerHTML = head + '<tr><td colspan="5" class="empty2">没有满足条件的未打谱面。</td></tr>';
       return;
     }
     $('tNew').innerHTML = head + rows.slice(0, 30).map(function (r) {
       var e = r.e;
-      var col = DC[e.dname] || '#ff2d6f';
+      var col = DC[e.dname] || '#ff4fa3';
       return '<tr style="--c:' + col + '"><td data-label="曲目"><span class="t">' + esc(e.title) +
         '</span><span class="sub">' + esc(e.ver) + '</span></td>' +
         '<td data-label="难度">' + esc(e.dname) + '<span class="sub">' + esc(e.tlabel) + '</span></td>' +
@@ -150,7 +149,7 @@
     $('bar').style.width = Math.max(2, Math.min(100, (S.base - from) / 10)) + '%';
     $('barNow').textContent = from;
     $('barNext').textContent = next;
-    $('milestone').innerHTML = '距离 <b>' + next + '</b> 还差 <b>' + (next - S.base) + '</b> 分。';
+    $('milestone').innerHTML = '还差 <b>' + (next - S.base) + '</b> 分 · 目标 <b>' + next + '</b>';
   }
 
   /* ---------- 取成绩（手机端入口） ---------- */
@@ -240,7 +239,7 @@
     $('who').textContent = (rec.nickname || rec.username || '?');
     $('modeTag').textContent = rec.mode === 'full' ? '完整成绩' : (rec.mode === 'test' ? '官方测试数据' : 'B50');
     $('when').textContent = (S.src ? '· ' + S.src : '') +
-      (rec.mode === 'test' ? ' · 这是一份假成绩，仅供看界面' : '');
+      (rec.mode === 'test' ? ' · 测试数据' : '');
 
     var oldN = rec.charts.filter(function (c) { return playable(c) && isOld(c); }).length;
     var newN = rec.charts.filter(function (c) { return playable(c) && c.is_new === true; }).length;
@@ -259,13 +258,12 @@
     var pos = S.exRows.filter(function (r) { return r.gain > 0; });
     var top = pos.slice(0, 6);
     if (top.length) {
-      $('milestone').innerHTML += ' 最划算的 6 步：' +
-        top.map(function (r) { return '+' + r.gain; }).join(' + ') + ' = <b>+' +
-        sum(top.map(function (r) { return r.gain; })) + '</b>。';
+      $('milestone').innerHTML += ' · 最划算 6 步 <b>+' +
+        sum(top.map(function (r) { return r.gain; })) + '</b>';
       var avg = Math.round(sum(pos.map(function (r) { return r.gain; })) / pos.length);
       if (avg > 0) {
-        $('milestone').innerHTML += ' 抬一档平均 <b>+' + avg + '</b> 分，' +
-          '凑齐这 ' + (S.next - S.base) + ' 分大约要抬 <b>' + Math.ceil((S.next - S.base) / avg) + '</b> 次档。';
+        $('milestone').innerHTML += ' · 平均 +' + avg + ' · 约 ' +
+          Math.ceil((S.next - S.base) / avg) + ' 次档';
       }
     }
   }
@@ -273,9 +271,8 @@
   function noData(err) {
     $('who').textContent = '还没有成绩数据';
     $('rating').textContent = '--';
-    $('milestone').innerHTML = '在上面「取成绩」里填水鱼用户名（B50）或粘 Import-Token（完整成绩）点一下就行' +
-      (err && err.message ? '（' + esc(err.message) + '）' : '') +
-      '；PC 上也可以跑 <code>python fetch_records.py --test</code> 先看界面。';
+    $('milestone').innerHTML = '先在「取成绩」里拉一次成绩' +
+      (err && err.message ? '（' + esc(err.message) + '）' : '');
     $('tNow').innerHTML = '';
     $('tNew').innerHTML = '';
   }

@@ -69,8 +69,8 @@
     S.pool = MM.filterEntries(S.entries, S.f);
     var n = S.pool.length;
     $('poolNum').textContent = n >= 10000 ? (n / 1000).toFixed(1) + 'k' : n;
-    $('poolInfo').textContent = '当前池 ' + n + ' 张谱面 / 曲目 ' +
-      new Set(S.pool.map(function (e) { return e.sid; })).size + ' 首';
+    $('poolInfo').textContent = '池 ' + n + ' 谱 · ' +
+      new Set(S.pool.map(function (e) { return e.sid; })).size + ' 曲';
     saveF();
   }
 
@@ -97,7 +97,7 @@
   function render(list) {
     var box = $('results');
     box.innerHTML = list.map(function (e, i) {
-      var c = DC[e.dname] || '#ff2d6f';
+      var c = DC[e.dname] || '#ff4fa3';
       return '<article class="card" style="--i:' + i + ';--c:' + c + '">' +
         '<span class="idx">' + String(i + 1).padStart(2, '0') + '</span>' +
         '<div class="tagrow"><span class="tag">' + esc(e.tlabel) + '</span>' +
@@ -122,7 +122,7 @@
   }
   function renderHist() {
     var box = $('hist');
-    if (!S.hist.length) { box.innerHTML = '<div class="none">还没有抽过</div>'; return; }
+    if (!S.hist.length) { box.innerHTML = '<div class="none">—</div>'; return; }
     box.innerHTML = S.hist.slice(-12).reverse().map(function (h) {
       var d = new Date(h.t), p = function (v) { return String(v).padStart(2, '0'); };
       return '<div><b>' + p(d.getMonth() + 1) + '/' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes()) +
@@ -144,7 +144,7 @@
       svg += '<rect x="-5" y="' + (-76 - (i % 2 ? 6 : 0)) + '" width="10" height="' + (14 + (i % 2 ? 4 : 0)) +
         '" rx="2" transform="rotate(' + deg + ')" />';
       svg += '<circle cx="' + (Math.sin(deg * Math.PI / 180) * inner * 2.6).toFixed(1) + '" cy="' +
-        (-Math.cos(deg * Math.PI / 180) * inner * 2.6).toFixed(1) + '" r="2.4" fill="#ff2d6f" opacity=".5"/>';
+        (-Math.cos(deg * Math.PI / 180) * inner * 2.6).toFixed(1) + '" r="2.4" fill="#ff4fa3" opacity=".5"/>';
     }
     g.innerHTML = svg;
   }
@@ -159,6 +159,7 @@
     $('go').onclick = draw;
     $('dial').onclick = draw;
     $('goFloat').onclick = draw;
+    if ($('emptyGo')) $('emptyGo').onclick = draw;
     $('verAll').onclick = function () { S.f.vers = MM.versionsOf(S.entries); buildVers(); refresh(); };
     $('verNone').onclick = function () { S.f.vers = []; buildVers(); refresh(); };
     $('clearHist').onclick = function () { S.hist = []; saveH(); renderHist(); flash('历史已清空'); };
@@ -167,7 +168,7 @@
         return (i + 1) + '. ' + e.title + '  [' + e.tlabel + ' ' + e.dname + ' ' +
           (e.ds == null ? '?' : e.ds.toFixed(1)) + ']  BPM ' + (e.bpm || '?') + '  谱师 ' + e.designer + '  (' + e.ver + ')';
       }).join('\n');
-      var done = function () { var b = $('copyBtn'); b.textContent = '已复制'; setTimeout(function () { b.textContent = '复制结果'; }, 1400); };
+      var done = function () { var b = $('copyBtn'); b.classList.add('ok'); setTimeout(function () { b.classList.remove('ok'); }, 1400); };
       if (navigator.clipboard) navigator.clipboard.writeText(txt).then(done, function () { window.prompt('手动复制', txt); });
       else window.prompt('手动复制', txt);
     };

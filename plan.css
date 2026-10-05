@@ -1,8 +1,7 @@
 /* 推分规划器专用样式（基础样式复用 style.css） */
 :root{--cut2:13px}
 .phero{display:flex;align-items:flex-end;gap:28px;flex-wrap:wrap;padding:26px 30px 14px;max-width:1500px;margin:0 auto}
-.phero h1{margin:8px 0 0;font:700 70px/1 var(--disp);letter-spacing:.01em;color:#fff;
-  text-shadow:0 0 42px rgba(255,45,111,.5)}
+.phero h1{margin:8px 0 0;font:700 70px/1 var(--disp);letter-spacing:.01em;color:#fff}
 .phero h1 .unit{font-size:26px;color:var(--hi);margin-left:8px;vertical-align:super}
 .kpis{display:flex;gap:12px;flex-wrap:wrap;flex:1;justify-content:flex-end}
 .kpi{border:1px solid var(--line);background:linear-gradient(180deg,var(--panel),var(--panel2));
@@ -19,7 +18,7 @@
   clip-path:polygon(0 0,calc(100% - var(--cut2)) 0,100% var(--cut2),100% 100%,var(--cut2) 100%,0 calc(100% - var(--cut2)))}
 .pbox h2{display:flex;align-items:center;gap:9px;margin:0 0 4px;font:600 12px/1 var(--mono);letter-spacing:.2em;color:var(--ink);text-transform:uppercase}
 .pbox h2 em{font-style:normal;color:var(--hi)}
-.hint{margin:6px 0 12px;font:11px/1.6 var(--mono);color:#7a8598}
+.hint{margin:6px 0 12px;font:11px/1.6 var(--mono);color:var(--weak)}
 .tablewrap{overflow:auto;max-height:520px}
 table{width:100%;border-collapse:collapse;font:12px var(--mono)}
 th{position:sticky;top:0;background:#12161d;color:var(--dim);font-weight:400;font-size:10px;letter-spacing:.1em;
@@ -28,15 +27,15 @@ th:first-child,td:first-child{text-align:left}
 td{padding:6px 9px;border-bottom:1px solid #171c24;text-align:right;white-space:nowrap}
 tr:hover td{background:#141a23}
 td .t{color:#e3eaf5}
-td .sub{color:#69748a;font-size:10px;margin-left:7px}
+td .sub{color:var(--weak);font-size:10px;margin-left:7px}
 .pill{display:inline-block;font-size:10px;padding:1px 5px;border:1px solid var(--line);color:var(--dim)}
 .gain{color:var(--cy);font-weight:700}
-.gain.zero{color:#5b6474;font-weight:400}
+.gain.zero{color:var(--weak);font-weight:400}
 .ds{color:var(--warn)}
-.empty2{color:#5f6a7b;font:12px var(--mono);padding:22px 4px}
+.empty2{color:var(--weak);font:12px var(--mono);padding:22px 4px}
 
 .bar{height:9px;background:#0c0f14;border:1px solid var(--line);position:relative;margin:10px 0 4px}
-.bar i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,var(--hi),#ff9d3d)}
+.bar i{position:absolute;left:0;top:0;bottom:0;background:var(--hi)}
 .bar-txt{display:flex;justify-content:space-between;font:11px var(--mono);color:var(--dim)}
 a{color:var(--cy)}
 .pbox h2 .spacer2{flex:1}
@@ -48,6 +47,7 @@ td.gap.near{color:var(--cy);font-weight:700}
 
 /* 取成绩面板 */
 .fetchrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.fetchrow .chk{flex:0 0 auto;white-space:nowrap}
 .fetchrow input{flex:1 1 180px;min-width:0}
 .mini.big{font-size:12px;padding:9px 14px}
 
@@ -57,9 +57,9 @@ td.gap.near{color:var(--cy);font-weight:700}
   .tablewrap{max-height:none;overflow:visible}
   table,thead,tbody,tr,td,th{display:block}
   thead{display:none}
-  tr{border:1px solid var(--line);border-left:3px solid var(--c,#ff2d6f);background:#12161d;margin-bottom:10px;padding:9px 11px}
+  tr{border:1px solid var(--line);border-left:3px solid var(--c,var(--hi));background:#12161d;margin-bottom:10px;padding:9px 11px}
   td{border:0;padding:3px 0;display:flex;justify-content:space-between;gap:12px;text-align:right;white-space:normal}
-  td:before{content:attr(data-label);color:#69748a;font-size:10px;letter-spacing:.1em;flex:0 0 auto;text-align:left}
+  td:before{content:attr(data-label);color:var(--weak);font-size:10px;letter-spacing:.1em;flex:0 0 auto;text-align:left}
   td:first-child{display:block;text-align:left;font-size:15px;border-bottom:1px solid #1b2129;margin-bottom:6px;padding-bottom:6px}
   td:first-child:before{content:""}
   .phero{padding:18px 14px 8px;flex-direction:column;align-items:stretch;gap:10px}
@@ -72,5 +72,4 @@ td.gap.near{color:var(--cy);font-weight:700}
   .pbox{padding:12px 12px 14px}
   .pbox h2{flex-wrap:wrap;row-gap:7px}
   .mini.big{flex:1 1 auto}
-  footer{padding:0 14px 22px}
 }

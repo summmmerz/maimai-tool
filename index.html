@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>抽歌终端 · MAIMAI DX</title>
-<meta name="theme-color" content="#07080b" />
+<meta name="theme-color" content="#0b0d10" />
 <link rel="manifest" href="manifest.json" />
 <link rel="icon" href="icons/icon-192.png" />
 <link rel="apple-touch-icon" href="icons/icon-192.png" />
@@ -15,18 +15,26 @@
 <div class="scan" aria-hidden="true"></div>
 
 <header class="hero">
-  <div class="dial" id="dial" title="点我也能抽">
+  <div class="dial" id="dial" title="点击抽取 · 空格或摇一摇">
     <svg viewBox="-100 -100 200 200" aria-hidden="true"><g id="dialBars"></g></svg>
     <div class="dial-core">
       <span class="dial-num" id="poolNum">--</span>
-      <span class="dial-cap">可抽谱面</span>
+      <span class="dial-cap">POOL</span>
     </div>
   </div>
   <div class="hero-txt">
     <p class="kicker">MAIMAI DX · CHALLENGE GENERATOR</p>
     <h1>抽歌终端<span class="blink">_</span></h1>
-    <p class="lede">按定数 / 难度 / 版本 / 谱师 / BPM 圈出练习池，随机抽谱。<span class="kbdon"><kbd>Space</kbd> 再抽一次。</span><span class="mobon">摇一摇手机，或点右下角按钮再抽。</span></p>
-    <p class="src">曲库 <b id="dbTotal">--</b> 首 · 谱面 <b id="dbCharts">--</b> 张 · 据源 落雪 lxns ＋ 水鱼 diving-fish · <a href="plan.html">推分规划器 →</a></p>
+    <nav class="acts">
+      <span class="stat"><b id="dbTotal">--</b><i>曲</i></span>
+      <span class="stat"><b id="dbCharts">--</b><i>谱</i></span>
+      <a class="icobtn" href="plan.html" title="推分规划器" aria-label="推分规划器">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 13.5V7M8 13.5V2.5M13.5 13.5V9.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="square"/></svg>
+      </a>
+      <button class="icobtn" id="aboutBtn" title="数据来源与说明" aria-label="数据来源与说明">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.3" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M8 7.3v4.2M8 4.9v.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="square"/></svg>
+      </button>
+    </nav>
   </div>
 </header>
 
@@ -38,9 +46,9 @@
         <label>数量<input id="n" type="number" min="1" max="30" value="3" /></label>
         <label>种子<input id="seed" type="text" placeholder="空=随机" /></label>
       </div>
-      <button id="go" class="go">抽 歌</button>
-      <label class="chk"><input id="noRepeat" type="checkbox" checked /> 排除历史抽过的谱面</label>
-      <label class="chk"><input id="perSong" type="checkbox" checked /> 同一首歌只出一张谱</label>
+      <button id="go" class="go" title="空格或摇一摇也可再抽">抽 歌</button>
+      <label class="chk" title="已经抽过的谱面不再出现"><input id="noRepeat" type="checkbox" checked /> 排除抽过</label>
+      <label class="chk" title="同一首歌最多只出一张谱面"><input id="perSong" type="checkbox" checked /> 每歌一张</label>
     </section>
 
     <section class="box">
@@ -87,16 +95,48 @@
       <span id="poolInfo">加载中…</span>
       <span class="spacer"></span>
       <span class="seedtag" id="seedTag"></span>
-      <button class="mini" id="copyBtn" disabled>复制结果</button>
+      <button class="icobtn" id="copyBtn" disabled title="复制结果" aria-label="复制结果">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="5.6" y="5.6" width="7.9" height="7.9" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M10.4 5.6V2.5H2.5v7.9h3.1" fill="none" stroke="currentColor" stroke-width="1.3"/></svg>
+      </button>
     </div>
-    <div id="results" class="results"><p class="empty">点「抽歌」开始。数据在本地跑，不联网。</p></div>
+    <div id="results" class="results">
+      <div class="empty">
+        <svg class="empty-ico" viewBox="-50 -50 100 100" aria-hidden="true"><g fill="currentColor">
+          <rect x="-5.5" y="-45" width="11" height="15"/><rect x="-5.5" y="30" width="11" height="15"/>
+          <rect x="-45" y="-5.5" width="15" height="11"/><rect x="30" y="-5.5" width="15" height="11"/>
+          <g transform="rotate(45)">
+            <rect x="-5.5" y="-45" width="11" height="15"/><rect x="-5.5" y="30" width="11" height="15"/>
+            <rect x="-45" y="-5.5" width="15" height="11"/><rect x="30" y="-5.5" width="15" height="11"/>
+          </g>
+        </g></svg>
+        <button class="go-inline" id="emptyGo">抽 歌</button>
+      </div>
+    </div>
   </section>
 </main>
 
-<footer>本地工具 · Python 标准库起服务 · 数据来自公开 API，仅供个人练习使用</footer>
-<button class="gof" id="goFloat">抽歌</button>
+<button class="gof" id="goFloat" title="再抽一次">抽歌</button>
+
+<dialog id="about" class="about">
+  <h3>数据与用法</h3>
+  <ul>
+    <li>曲库：<b>落雪 lxns</b>（定数 / 谱师 / BPM）＋ <b>水鱼 diving-fish</b>（版本名 / 物量）</li>
+    <li>按定数 / 难度 / 版本 / 谱师 / BPM 圈出练习池，再从中随机抽谱</li>
+    <li><kbd>Space</kbd> 或摇一摇手机可再抽一次</li>
+    <li>成绩与历史只存在这台设备的浏览器里，不联网上传</li>
+    <li>本地工具：<code>python</code> 标准库起服务，数据来自公开 API，仅供个人练习使用</li>
+  </ul>
+  <form method="dialog"><button class="mini big">关闭</button></form>
+</dialog>
+
 <script src="core.js"></script>
 <script src="app.js"></script>
-<script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}</script>
+<script>
+(function () {
+  var d = document.getElementById('about'), b = document.getElementById('aboutBtn');
+  if (d && b) { b.onclick = function () { d.showModal(); }; d.addEventListener('click', function (e) { if (e.target === d) d.close(); }); }
+  if ('serviceWorker' in navigator) { window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); }); }
+})();
+</script>
 </body>
 </html>
