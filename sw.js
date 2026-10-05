@@ -1,5 +1,5 @@
 /* Service Worker：静态资源 cache-first，同源数据文件首次成功即缓存，水鱼 API 一律走网络 */
-var CACHE = 'mmdx-v4';
+var CACHE = 'mmdx-v5';
 var SHELL = [
   './', 'index.html', 'plan.html',
   'style.css', 'plan.css', 'core.js', 'app.js', 'plan.js',

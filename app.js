@@ -2,8 +2,8 @@
 (function () {
   'use strict';
   var $ = function (id) { return document.getElementById(id); };
-  var DC = { Basic: '#22c55e', Advanced: '#ffc400', Expert: '#ff3b3b', Master: '#a855f7', 'Re:Master': '#ff2d9b' };
-  var TYPES = [['standard', 'SD 标准谱'], ['dx', 'DX 谱'], ['utage', '宴会场']];
+  var DC = { Basic: '#35e07a', Advanced: '#f5a524', Expert: '#f0503a', Master: '#b57bfa', 'Re:Master': '#ffffff' };
+  var TYPES = [['standard', 'SD 标准谱'], ['dx', 'DX 谱']];
   var LF = 'mmdraw.filters', LH = 'mmdraw.hist';
   var S = { entries: [], pool: [], f: null, hist: [], last: [] };
 
@@ -42,7 +42,7 @@
   function buildTypes() {
     var box = $('typeChips'); box.innerHTML = '';
     TYPES.forEach(function (t) {
-      box.appendChild(mkChip(t[1], S.f.types.indexOf(t[0]) >= 0, t[0] === 'utage' ? '#7c8798' : undefined, function () {
+      box.appendChild(mkChip(t[1], S.f.types.indexOf(t[0]) >= 0, undefined, function () {
         toggle(S.f.types, t[0]); buildTypes(); refresh();
       }));
     });
@@ -50,7 +50,7 @@
   function buildVers() {
     var box = $('verChips'); box.innerHTML = '';
     MM.versionsOf(S.entries).forEach(function (v) {
-      box.appendChild(mkChip(v, S.f.vers.indexOf(v) >= 0, '#25e8d0', function () {
+      box.appendChild(mkChip(v, S.f.vers.indexOf(v) >= 0, '#22d3ee', function () {
         toggle(S.f.vers, v); buildVers(); refresh();
       }));
     });
@@ -78,15 +78,11 @@
   function draw() {
     if (!S.pool.length) { flash('池子是空的，放宽点条件'); return; }
     var n = Math.max(1, Math.min(30, parseInt($('n').value, 10) || 3));
-    var seedRaw = $('seed').value.trim();
-    var seedInt = MM.seedToInt(seedRaw);
-    var rng = MM.mulberry32(seedInt);
     var excl = [];
     if ($('noRepeat').checked) S.hist.forEach(function (h) { excl = excl.concat(h.keys); });
-    var picked = MM.drawN(S.pool, n, rng, excl, $('perSong').checked);
+    var picked = MM.drawN(S.pool, n, Math.random, excl, $('perSong').checked);
     if (!picked.length) { flash('池内谱面都被历史排除了，清一下历史'); return; }
     S.last = picked;
-    $('seedTag').textContent = 'seed ' + seedInt;
     $('go').disabled = true;
     var d = $('dial'); d.classList.remove('rolling'); void d.offsetWidth; d.classList.add('rolling');
     render(picked);

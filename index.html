@@ -15,7 +15,7 @@
 <div class="scan" aria-hidden="true"></div>
 
 <header class="hero">
-  <div class="dial" id="dial" title="点击抽取 · 空格或摇一摇">
+  <div class="dial" id="dial" aria-label="抽取">
     <svg viewBox="-100 -100 200 200" aria-hidden="true"><g id="dialBars"></g></svg>
     <div class="dial-core">
       <span class="dial-num" id="poolNum">--</span>
@@ -28,8 +28,8 @@
     <nav class="acts">
       <span class="stat"><b id="dbTotal">--</b><i>曲</i></span>
       <span class="stat"><b id="dbCharts">--</b><i>谱</i></span>
-      <a class="icobtn" href="plan.html" title="推分规划器" aria-label="推分规划器">
-        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 13.5V7M8 13.5V2.5M13.5 13.5V9.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="square"/></svg>
+      <a class="actbtn" href="plan.html" title="按你的成绩算推分收益">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 13.5V7M8 13.5V2.5M13.5 13.5V9.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="square"/></svg><span>推分规划</span>
       </a>
       <button class="icobtn" id="aboutBtn" title="数据来源与说明" aria-label="数据来源与说明">
         <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.3" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M8 7.3v4.2M8 4.9v.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="square"/></svg>
@@ -42,10 +42,7 @@
   <aside class="rail">
     <section class="box">
       <h2>抽取</h2>
-      <div class="row">
-        <label>数量<input id="n" type="number" min="1" max="30" value="3" /></label>
-        <label>种子<input id="seed" type="text" placeholder="空=随机" /></label>
-      </div>
+      <label>数量<input id="n" type="number" min="1" max="30" value="3" /></label>
       <button id="go" class="go" title="空格或摇一摇也可再抽">抽 歌</button>
       <label class="chk" title="已经抽过的谱面不再出现"><input id="noRepeat" type="checkbox" checked /> 排除抽过</label>
       <label class="chk" title="同一首歌最多只出一张谱面"><input id="perSong" type="checkbox" checked /> 每歌一张</label>
@@ -75,8 +72,8 @@
         <label>BPM ≥<input id="bpmMin" type="number" min="0" placeholder="不限" /></label>
         <label>BPM ≤<input id="bpmMax" type="number" min="0" placeholder="不限" /></label>
       </div>
-      <label class="full">歌名<input id="qTitle" type="text" placeholder="模糊匹配" /></label>
-      <label class="full">谱师<input id="qDesigner" type="text" placeholder="模糊匹配" /></label>
+      <label class="full">歌名<input id="qTitle" type="text" placeholder="歌名 · 别名" title="支持中文译名、罗马音与社区绰号，例：快乐断手器 / happysynthesizer" /></label>
+      <label class="full">谱师<input id="qDesigner" type="text" placeholder="谱师 · 罗马音" title="假名可打罗马音，省略「譜面-」前缀也能命中，例：nyain / 100号" /></label>
     </section>
 
     <section class="box">
@@ -94,7 +91,6 @@
     <div class="stage-bar">
       <span id="poolInfo">加载中…</span>
       <span class="spacer"></span>
-      <span class="seedtag" id="seedTag"></span>
       <button class="icobtn" id="copyBtn" disabled title="复制结果" aria-label="复制结果">
         <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="5.6" y="5.6" width="7.9" height="7.9" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M10.4 5.6V2.5H2.5v7.9h3.1" fill="none" stroke="currentColor" stroke-width="1.3"/></svg>
       </button>
@@ -122,6 +118,7 @@
   <ul>
     <li>曲库：<b>落雪 lxns</b>（定数 / 谱师 / BPM）＋ <b>水鱼 diving-fish</b>（版本名 / 物量）</li>
     <li>按定数 / 难度 / 版本 / 谱师 / BPM 圈出练习池，再从中随机抽谱</li>
+    <li>歌名与谱师支持中文译名、罗马音与常见绰号（例：快乐断手器 / nyain / 100号）</li>
     <li><kbd>Space</kbd> 或摇一摇手机可再抽一次</li>
     <li>成绩与历史只存在这台设备的浏览器里，不联网上传</li>
     <li>本地工具：<code>python</code> 标准库起服务，数据来自公开 API，仅供个人练习使用</li>

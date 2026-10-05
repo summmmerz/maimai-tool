@@ -12,10 +12,12 @@ import json, os, sys, collections, urllib.request
 UA = {'User-Agent': 'Mozilla/5.0'}
 URL_DF = 'https://www.diving-fish.com/api/maimaidxprober/music_data'
 URL_LX = 'https://maimai.lxns.net/api/v0/maimai/song/list'
+URL_ALIAS = 'https://maimai.lxns.net/api/v0/maimai/alias/list'
 HERE = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.join(HERE, 'data')
 DF_RAW = os.path.join(DATA, 'raw_divingfish.json')
 LX_RAW = os.path.join(DATA, 'raw_lxns.json')
+ALIAS_RAW = os.path.join(DATA, 'raw_alias.json')
 OUT = os.path.join(DATA, 'songs.json')
 DIFF_NAME = ['Basic', 'Advanced', 'Expert', 'Master', 'Re:Master']
 
@@ -106,6 +108,19 @@ def main():
         'version_map': {str(k): v.most_common(1)[0][0] for k, v in sorted(votes.items()) if v},
         'songs': songs,
     }
+    # 曲目别名（落雪公开接口，无需密钥）：中文译名 / 罗马音 / 社区绰号。
+    # 拉取失败不影响主流程，只是没有别名可搜。
+    amap = {}
+    try:
+        alias_raw = get(URL_ALIAS, ALIAS_RAW)
+        amap = {int(a['song_id']): [x for x in a.get('aliases', []) if x] for a in alias_raw.get('aliases', [])}
+    except Exception as e:
+        print('  ! 别名拉取失败，跳过：%s' % e)
+    for s in songs:
+        s['aliases'] = amap.get(s['id'], [])
+    print('别名: 覆盖 %d / %d 首，别名字符串 %d 条'
+          % (sum(1 for s in songs if s['aliases']), len(songs), sum(len(s['aliases']) for s in songs)))
+
     with open(OUT, 'w', encoding='utf-8') as f:
         json.dump(payload, f, ensure_ascii=False, separators=(',', ':'))
     print('songs=%d charts=%d  size=%.0fKB' % (len(songs), sum(len(s['charts']) for s in songs), os.path.getsize(OUT) / 1024))

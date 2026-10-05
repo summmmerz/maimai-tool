@@ -6,7 +6,7 @@
   --hi:#ff4fa3; --cy:#22d3ee; --warn:#f5a524; --danger:#f0503a; --ok:#35e07a;
   --disp:"Barlow Condensed","Bahnschrift","DIN Alternate","Franklin Gothic Medium",Impact,sans-serif;
   --mono:"Cascadia Mono",Consolas,"Courier New",monospace;
-  --sans:system-ui,"Inter","Microsoft YaHei UI","PingFang SC","Noto Sans SC",sans-serif;
+  --sans:system-ui,"Inter","Segoe UI","Noto Sans SC",sans-serif;
   --cut:13px;
   --ease:cubic-bezier(.2,0,0,1); --dur:150ms;
   --shadow-float:0 8px 24px rgba(0,0,0,.45);
@@ -46,6 +46,14 @@ body{
 .icobtn:hover{color:var(--hi);border-color:var(--hi)}
 .icobtn:disabled{opacity:.4;cursor:not-allowed}
 .icobtn.ok{color:var(--ok);border-color:var(--ok)}
+/* 主入口：图标 + 一个短标签，靠位置、描边与强调色引导，不加解释性文字 */
+.actbtn{display:inline-flex;align-items:center;gap:7px;height:30px;padding:0 12px;
+  border:1px solid color-mix(in srgb,var(--cy) 45%,transparent);background:#0d1015;color:var(--cy);
+  text-decoration:none;font:600 12px/1 var(--sans);letter-spacing:.02em;
+  clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px));
+  transition:color var(--dur) var(--ease),background var(--dur) var(--ease),border-color var(--dur) var(--ease)}
+.actbtn svg{width:15px;height:15px;display:block}
+.actbtn:hover{background:var(--cy);border-color:var(--cy);color:#0b0d0f}
 .src{margin:0;font:12px var(--mono);color:var(--dim)}
 .src b{color:var(--ink)}
 kbd{font:11px var(--mono);border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;
@@ -78,7 +86,7 @@ label{display:flex;flex-direction:column;gap:5px;font:11px var(--mono);color:var
 label.full{margin-top:9px}
 input[type=text],input[type=number]{width:100%;background:#0a0c11;border:1px solid var(--line);color:var(--ink);
   padding:7px 9px;font:13px var(--mono);outline:none;transition:border-color .15s,box-shadow .15s}
-input:focus{border-color:var(--hi);box-shadow:0 0 0 2px rgba(255,45,111,.18)}
+input:focus{border-color:var(--hi);box-shadow:0 0 0 2px color-mix(in srgb,var(--hi) 22%,transparent)}
 input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .chk{flex-direction:row;align-items:center;gap:7px;margin-top:9px;font:11px var(--mono);color:var(--dim);cursor:pointer}
 input[type=checkbox]{appearance:none;width:15px;height:15px;border:1px solid var(--line);background:#0a0c11;cursor:pointer;flex:0 0 auto}
@@ -115,7 +123,6 @@ input[type=checkbox]:checked{background:var(--hi);border-color:var(--hi);box-sha
   border:1px solid var(--line);background:var(--panel);
   font:11px var(--mono);color:var(--dim);clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px))}
 .stage-bar .spacer{flex:1}
-.seedtag{color:var(--cy)}
 .results{display:grid;grid-template-columns:repeat(auto-fill,minmax(292px,1fr));gap:14px}
 .empty{grid-column:1/-1;display:grid;place-items:center;gap:20px;padding:48px 0;border:1px dashed var(--line)}
 .empty-ico{width:66px;height:66px;color:var(--line2)}

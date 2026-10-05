@@ -4,17 +4,86 @@
   var DIFFS = ['Basic', 'Advanced', 'Expert', 'Master', 'Re:Master'];
   var TYPE_LABEL = { standard: 'SD', dx: 'DX', utage: '宴' };
 
+  /* ---- 搜索：归一化 + 假名罗马音 ----
+     中文玩家打不出假名，所以匹配串 = 原文 + 别名 + 罗马音，做归一化后的子串命中。
+     别名来自落雪公开的 /api/v0/maimai/alias/list（中文译名 / 罗马音 / 社区绰号）。 */
+  var ROMAJI_DIGRAPH = { 'きゃ':'kya','きゅ':'kyu','きょ':'kyo','しゃ':'sha','しゅ':'shu','しょ':'sho','しぇ':'she',
+    'じゃ':'ja','じゅ':'ju','じょ':'jo','じぇ':'je','ちゃ':'cha','ちゅ':'chu','ちょ':'cho','ちぇ':'che',
+    'にゃ':'nya','にゅ':'nyu','にょ':'nyo','ひゃ':'hya','ひゅ':'hyu','ひょ':'hyo','みゃ':'mya','みゅ':'myu','みょ':'myo',
+    'りゃ':'rya','りゅ':'ryu','りょ':'ryo','ぎゃ':'gya','ぎゅ':'gyu','ぎょ':'gyo','びゃ':'bya','びゅ':'byu','びょ':'byo',
+    'ぴゃ':'pya','ぴゅ':'pyu','ぴょ':'pyo','ふぁ':'fa','ふぃ':'fi','ふぇ':'fe','ふぉ':'fo','てぃ':'ti','でぃ':'di',
+    'うぃ':'wi','うぇ':'we','うぉ':'wo','ゔぁ':'va','ゔぃ':'vi','ゔぇ':'ve','ゔぉ':'vo' };
+  var ROMAJI_ONE = { 'あ':'a','い':'i','う':'u','え':'e','お':'o','か':'ka','き':'ki','く':'ku','け':'ke','こ':'ko',
+    'さ':'sa','し':'shi','す':'su','せ':'se','そ':'so','た':'ta','ち':'chi','つ':'tsu','て':'te','と':'to',
+    'な':'na','に':'ni','ぬ':'nu','ね':'ne','の':'no','は':'ha','ひ':'hi','ふ':'fu','へ':'he','ほ':'ho',
+    'ま':'ma','み':'mi','む':'mu','め':'me','も':'mo','や':'ya','ゆ':'yu','よ':'yo','ら':'ra','り':'ri','る':'ru',
+    'れ':'re','ろ':'ro','わ':'wa','を':'wo','ん':'n','が':'ga','ぎ':'gi','ぐ':'gu','げ':'ge','ご':'go',
+    'ざ':'za','じ':'ji','ず':'zu','ぜ':'ze','ぞ':'zo','だ':'da','ぢ':'ji','づ':'zu','で':'de','ど':'do',
+    'ば':'ba','び':'bi','ぶ':'bu','べ':'be','ぼ':'bo','ぱ':'pa','ぴ':'pi','ぷ':'pu','ぺ':'pe','ぽ':'po',
+    'ぁ':'a','ぃ':'i','ぅ':'u','ぇ':'e','ぉ':'o','ゃ':'ya','ゅ':'yu','ょ':'yo','ゎ':'wa','ー':'' };
+
+  function kana2romaji(s) {
+    if (!s) return '';
+    s = String(s).replace(/[\u30a1-\u30f6]/g, function (ch) {
+      return String.fromCharCode(ch.charCodeAt(0) - 0x60);          // 片假名 -> 平假名
+    });
+    var out = '', i, two, c, nxt;
+    for (i = 0; i < s.length; i++) {
+      two = s.substr(i, 2);
+      if (ROMAJI_DIGRAPH[two]) { out += ROMAJI_DIGRAPH[two]; i++; continue; }
+      c = s.charAt(i);
+      if (c === 'っ') {                                             // 促音：吃掉下一个声母
+        nxt = ROMAJI_DIGRAPH[s.substr(i + 1, 2)] || ROMAJI_ONE[s.charAt(i + 1)] || '';
+        out += nxt.charAt(0);
+        continue;
+      }
+      out += ROMAJI_ONE[c] != null ? ROMAJI_ONE[c] : c;
+    }
+    return out;
+  }
+
+  /* 归一化：全角 -> 半角、去空白与标点、小写 */
+  function fold(s) {
+    return String(s == null ? '' : s).toLowerCase()
+      .replace(/[\uff01-\uff5e]/g, function (c) { return String.fromCharCode(c.charCodeAt(0) - 0xfee0); })
+      .replace(/[\u3000\s\-_·・.,:;!?'"“”‘’()\[\]{}<>《》【】/\\|+*~^%$#@&=`]/g, '');
+  }
+
+  /* 谱师别名：只补算法拼不出来的两种（罗马音与剥 «譜面-» 前缀已在 flatten 里处理） */
+  var DESIGNER_ALIAS = {
+    '小鳥遊さん': ['takanashi'],
+    'はっぴー': ['happy'],
+    'サファ太': ['safata']
+  };
+
+  function hayOf(parts) {
+    var out = '', i;
+    for (i = 0; i < parts.length; i++) {
+      if (!parts[i]) continue;
+      out += '|' + fold(parts[i]) + '|' + fold(kana2romaji(parts[i]));
+    }
+    return out;
+  }
+
   function flatten(songs) {
-    var out = [], i, j, s, c;
+    var out = [], i, j, s, c, hay, dhay, dparts, dstrip;
     for (i = 0; i < songs.length; i++) {
       s = songs[i];
+      hay = hayOf([s.title].concat(s.aliases || []));               // 每首歌算一次，各谱面共享同一个字符串
       for (j = 0; j < s.charts.length; j++) {
         c = s.charts[j];
+        dparts = [c.designer];
+        dstrip = String(c.designer).replace(/^譜面-?/, '');
+        if (dstrip !== c.designer) dparts.push(dstrip);
+        if (DESIGNER_ALIAS[c.designer]) dparts = dparts.concat(DESIGNER_ALIAS[c.designer]);
+        dhay = hayOf(dparts);
         out.push({
           sid: s.id, title: s.title, artist: s.artist, genre: s.genre, bpm: s.bpm,
           ver: s.version_name, vcode: s.version, utage: s.id >= 100000,
+          aliases: s.aliases || [],
           type: c.type, tlabel: TYPE_LABEL[c.type] || c.type,
           diff: c.diff, dname: c.name, ds: c.ds, designer: c.designer, notes: c.notes,
+          hay: hay, dhay: dhay,
           key: s.id + ':' + c.type + ':' + c.diff
         });
       }
@@ -26,8 +95,7 @@
 
   function filterEntries(list, f) {
     f = f || {};
-    var low = function (v) { return String(v == null ? '' : v).toLowerCase(); };
-    var qT = low(f.title), qD = low(f.designer);
+    var qT = fold(f.title), qD = fold(f.designer);
     return list.filter(function (e) {
       if (has(f.diffs) && f.diffs.indexOf(e.dname) < 0) return false;
       if (has(f.types) && f.types.indexOf(e.type) < 0) return false;
@@ -36,31 +104,10 @@
       if (f.dsMax != null && !(e.ds != null && e.ds <= f.dsMax)) return false;
       if (f.bpmMin != null && !(e.bpm >= f.bpmMin)) return false;
       if (f.bpmMax != null && !(e.bpm > 0 && e.bpm <= f.bpmMax)) return false;
-      if (qT && low(e.title).indexOf(qT) < 0) return false;
-      if (qD && low(e.designer).indexOf(qD) < 0) return false;
+      if (qT && e.hay.indexOf(qT) < 0) return false;
+      if (qD && e.dhay.indexOf(qD) < 0) return false;
       return true;
     });
-  }
-
-  function mulberry32(a) {
-    return function () {
-      a |= 0; a = a + 0x6D2B79F5 | 0;
-      var t = Math.imul(a ^ a >>> 15, 1 | a);
-      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
-      return ((t ^ t >>> 14) >>> 0) / 4294967296;
-    };
-  }
-
-  /* 字符串种子 -> 32 位整数（FNV-1a），保证同一种子可复现 */
-  function seedToInt(s) {
-    if (s == null || s === '') return (Math.random() * 0xFFFFFFFF) >>> 0;
-    if (/^\d+$/.test(String(s))) return (parseInt(s, 10) >>> 0);
-    var h = 0x811c9dc5, str = String(s);
-    for (var i = 0; i < str.length; i++) {
-      h ^= str.charCodeAt(i);
-      h = Math.imul(h, 0x01000193) >>> 0;
-    }
-    return h >>> 0;
   }
 
   function drawN(pool, n, rng, excludeKeys, perSong) {
@@ -190,9 +237,10 @@
 
   var api = {
     DIFFS: DIFFS, TYPE_LABEL: TYPE_LABEL, flatten: flatten, filterEntries: filterEntries,
-    mulberry32: mulberry32, seedToInt: seedToInt, drawN: drawN, versionsOf: versionsOf,
+    drawN: drawN, versionsOf: versionsOf,
     SC_TABLE: SC_TABLE, RANK_NAME: RANK_NAME, RICK_BANDS: RICK_BANDS,
     scIndex: scIndex, calcRa: calcRa, nextBand: nextBand, nextRa1: nextRa1, totalRating: totalRating,
+    fold: fold, kana2romaji: kana2romaji,
     normRec: normRec, newmapOf: newmapOf, recordsFromApi: recordsFromApi
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;

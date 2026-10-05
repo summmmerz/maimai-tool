@@ -39,6 +39,7 @@
 | 来源 | 拿它做什么 |
 |---|---|
 | [落雪 maimai DX API](https://maimai.lxns.net/docs/api/maimai) | 主数据：定数 `level_value`、谱师 `note_designer`、BPM、曲目版本 |
+| [落雪别名接口](https://maimai.lxns.net/api/v0/maimai/alias/list) | 曲目别名：中文译名 / 罗马音 / 社区绰号（无需密钥） |
 | [水鱼 diving-fish API](https://maimai.diving-fish.com/manual/docs/developer/zh-api-document) | 版本名（`basic_info.from`）、物量（note 数） |
 
 两条踩坑记录（写死在脚本里）：
@@ -46,6 +47,12 @@
 - **水鱼的 DX 谱曲目 id = 标准谱 id + 10000**，不换算的话有一半曲目匹配不上。
 - 落雪按谱面给 `version` 码，水鱼给版本名字符串，所以版本名用「按 `version` 码投票」推导，
   1282 首能直接命中，剩下 62 首是宴会场曲目，统一标为「宴会场」。
+- **歌名 / 谱师支持中文别名与罗马音**：曲目别名来自落雪 `alias/list`（覆盖 1044 / 1344 首，
+  含「快乐断手器」「扭腰舞」这类社区绰号，以及 `happysynthesizer` 这类罗马音）。
+  谱师没有别名数据集，用「假名 → 罗马音 + 剥掉 `譜面-` 前缀 + 归一化子串命中」解决：
+  `ニャイン`→`nyain`、`はっぴー`→`happi`、`譜面-100号`→`100号`。
+  三条谱师别名（`小鳥遊さん`→`takanashi` 等）写在 `core.js` 的 `DESIGNER_ALIAS` 里，可自行追加。
+- 宴会场谱面仍留在数据里（用于「新血」表的排除判断），但抽歌器的谱面类型只有 SD / DX。
 
 更新曲库：双击 `update-db.bat`（重新抓取并覆盖 `data/songs.json`）。
 `data/raw_*.json` 是原始响应缓存，删掉后会自动重抓。

@@ -3,7 +3,7 @@
   'use strict';
   var $ = function (id) { return document.getElementById(id); };
   var T_OLD = 35, T_NEW = 15, CAP = 100.5, LR = 'mmdraw.records', LRTOK = 'mmdraw.itoken';
-  var DC = { Basic: '#22c55e', Advanced: '#ffc400', Expert: '#ff3b3b', Master: '#a855f7', 'Re:Master': '#ff2d9b' };
+  var DC = { Basic: '#35e07a', Advanced: '#f5a524', Expert: '#f0503a', Master: '#b57bfa', 'Re:Master': '#ffffff' };
   var DIFF_BY_INDEX = ['Basic', 'Advanced', 'Expert', 'Master', 'Re:Master'];
   var S = { rec: null, songs: null, entries: [], base: 0, cutoff: 0, exRows: [], sort: 'gap', onlyGain: true, src: '' };
 
@@ -271,8 +271,8 @@
   function noData(err) {
     $('who').textContent = '还没有成绩数据';
     $('rating').textContent = '--';
-    $('milestone').innerHTML = '先在「取成绩」里拉一次成绩' +
-      (err && err.message ? '（' + esc(err.message) + '）' : '');
+    $('milestone').innerHTML = '先在 00 拉一次成绩';
+    if (err && err.message) msg('读不到成绩：' + err.message);
     $('tNow').innerHTML = '';
     $('tNew').innerHTML = '';
   }
